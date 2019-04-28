@@ -60,6 +60,12 @@ def handle_dialog(res, req):
     if sessionStorage[user_id]['first_name'] is None:
         if 'помощь' == req['request']['nlu']['tokens'][0]:
             res['response']['text'] = get_help(user_id)
+            res['response']['buttons'] = [
+                {
+                    'title': 'Помощь',
+                    'hide': False
+                }
+            ]
             return
 
         first_name = get_first_name(req)
@@ -108,6 +114,12 @@ def handle_dialog(res, req):
             ]
 
     if 'помощь' == req['request']['nlu']['tokens'][0]:
+        res['response']['buttons'] = [
+            {
+                'title': 'Помощь',
+                'hide': False
+            }
+        ]
         res['response']['text'] = get_help(user_id)
 
     if len(req['request']['nlu']['tokens']) >= 2 and 'добавь' == req['request']['nlu']['tokens'][0] and 'адрес' \
@@ -152,7 +164,12 @@ def handle_dialog(res, req):
         if len(req['request']['nlu']['tokens']) > 1:
             cords = get_cords(sessionStorage[user_id]['city'] + ', ' + sessionStorage[user_id]['address'])
             search = "https://search-maps.yandex.ru/v1/"
-
+            res['response']['buttons'] = [
+                {
+                    'title': 'Помощь',
+                    'hide': False
+                }
+            ]
             search_params = {
                 "apikey": 'dda3ddba-c9ea-4ead-9010-f43fbc15c6e3',
                 "text": ' '.join(req['request']['nlu']['tokens'][1:]),
@@ -162,7 +179,12 @@ def handle_dialog(res, req):
             }
 
             response = requests.get(search, params=search_params)
-
+            res['response']['buttons'] = [
+                {
+                    'title': 'Помощь',
+                    'hide': False
+                }
+            ]
             if not response:
                 res['response']['text'] = "Мне не удалось найти ни одной организации"
                 res['response']['buttons'] = [
@@ -176,6 +198,12 @@ def handle_dialog(res, req):
                 response = response.json()
 
                 if len(response['features']) > 1:
+                    res['response']['buttons'] = [
+                        {
+                            'title': 'Помощь',
+                            'hide': False
+                        }
+                    ]
 
                     object = response['features'][0]
                     address = object['properties']['CompanyMetaData']['address']
@@ -185,6 +213,12 @@ def handle_dialog(res, req):
                     res['response']['text'] = f'Название: {name} \n' \
                         f'Адрес: {address} \n' \
                         f'Расстояние: {distance} км.'
+                    res['response']['buttons'] = [
+                        {
+                            'title': 'Помощь',
+                            'hide': False
+                        }
+                    ]
                 else:
 
                     res['response']['text'] = "Я не смогла найти не одного объекта"
@@ -214,6 +248,7 @@ def get_help(user_id):
     elif sessionStorage[user_id]['city'] is None:
         return "Назовите свой город"
     else:
+
         return 'Вы также можете уточнить свое местоположение написав "Добавь адрес [адрес]" \n ' \
                " Например: Добавь адрес Чичерина 27\n " \
                "В адресе должен быть обязательно указан дом \n" \
